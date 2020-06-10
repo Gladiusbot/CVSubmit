@@ -4,7 +4,7 @@ import torch.nn as nn
 
 def conv3x3(in_planes, out_planes, stride=1, group=1, dilation=1):
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
-        padding=dilation, groups=groups, bias=False, dilation=dilation)
+        padding=dilation, groups=group, bias=False, dilation=dilation)
 
 def conv1x1(in_planes, out_planes, stride=1):
     return nn.Conv2d(in_planes, out_planes, kernel_size=1,
@@ -35,8 +35,8 @@ class BasicBlock(nn.Module):
         identity = x
 
         out = self.conv1(x)
-        out = slef.bn1(out)
-        out = slef.relu(out)
+        out = self.bn1(out)
+        out = self.relu(out)
 
         out = self.conv2(out)
         out = self.bn2(out)
@@ -90,7 +90,7 @@ class Bottleneck(nn.Module):
         out += identity
         out = self.relu(out)
 
-        return our
+        return out
 
 
 class ResNet(nn.Module):
@@ -126,7 +126,7 @@ class ResNet(nn.Module):
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(512 * block.expansion, num_classes)
 
-        for m in slef.modules():
+        for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
             elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
@@ -171,7 +171,7 @@ class ResNet(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
 
-        x = slef.avgpool(x)
+        x = self.avgpool(x)
         x = torch.flatten(x, 1)
         x = self.fc(x)
 
